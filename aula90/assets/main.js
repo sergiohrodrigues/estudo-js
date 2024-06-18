@@ -1,19 +1,3 @@
-const request = obj => {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(obj.method, obj.url, true);
-        xhr.send();
-
-        xhr.addEventListener('load', () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                resolve(xhr.responseText);
-            } else {
-                reject(xhr.statusText);
-            }
-        });
-    })
-}
-
 document.addEventListener('click', e => {
     const el = e.target;
     const tag = el.tagName.toLowerCase();
@@ -25,26 +9,15 @@ document.addEventListener('click', e => {
 })
 
 async function carregaPagina(el) {
-    const href = el.getAttribute('href');
-    // request({
-    //     method: 'GET',
-    //     url: href,
-    //     success: function (response) {
-    //         carregaResultado(response);
-    //     },
-    //     error: function (response) {
-    //         console.log(response);
-    //     }
-    // })
-
-    const objConfig = {
-        method: 'GET',
-        url: href,
-    }
-
     try {
-        const response = await request(objConfig);
-        carregaResultado(response);
+        const href = el.getAttribute('href');
+        const resposta = await fetch(href);
+    
+        if(resposta.status !== 200) throw new Error('ERRO 404');
+    
+        const html = await resposta.text();
+    
+        carregaResultado(html);
     } catch (error) {
         console.log(error)
     }
@@ -54,10 +27,3 @@ function carregaResultado(response) {
     const conteudo = document.querySelector('.resultado');
     conteudo.innerHTML = response;
 }
-
-fetch('pagina1.html')
-    .then(resposta => {
-        return resposta.text();
-    })
-    .then(html => {
-    })
